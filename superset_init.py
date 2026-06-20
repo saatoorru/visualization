@@ -135,14 +135,16 @@ def _pos(title, chart_ids):
 
 
 def save_dash(title, slug, chart_ids):
+    from datetime import datetime
     conn = get_sqlite(); cur = conn.cursor()
+    now = datetime.utcnow().isoformat()
     p = _pos(title, chart_ids)
     row = cur.execute("SELECT id FROM dashboards WHERE slug=?", (slug,)).fetchone()
     if row:
         cur.execute("UPDATE dashboards SET dashboard_title=?, position_json=?, published=1 WHERE id=?", (title, p, row[0]))
         did = row[0]
     else:
-        cur.execute("INSERT INTO dashboards (dashboard_title, slug, published, position_json) VALUES (?, ?, 1, ?)", (title, slug, p))
+        cur.execute("INSERT INTO dashboards (dashboard_title, slug, published, position_json, created_on, changed_on) VALUES (?, ?, 1, ?, ?, ?)", (title, slug, p, now, now))
         did = cur.execute("SELECT id FROM dashboards WHERE slug=?", (slug,)).fetchone()[0]
     for cid in chart_ids:
         cur.execute("INSERT OR IGNORE INTO dashboard_slices (dashboard_id, slice_id) VALUES (?, ?)", (did, cid))
