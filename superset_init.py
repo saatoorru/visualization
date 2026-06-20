@@ -137,7 +137,7 @@ def _pos(title, chart_ids):
 def save_dash(title, slug, chart_ids):
     from datetime import datetime
     conn = get_sqlite(); cur = conn.cursor()
-    now = datetime.utcnow().isoformat()
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
     p = _pos(title, chart_ids)
     row = cur.execute("SELECT id FROM dashboards WHERE slug=?", (slug,)).fetchone()
     if row:
