@@ -54,12 +54,15 @@ def get_sqlite():
 def clean_all():
     conn = get_sqlite()
     cur = conn.cursor()
+    cur.execute("PRAGMA foreign_keys = ON")
     cur.execute("DELETE FROM dashboard_slices")
     cur.execute("DELETE FROM slices")
     cur.execute("DELETE FROM tables")
     cur.execute("DELETE FROM dbs")
+    cur.execute("DELETE FROM dashboards")
     conn.commit()
     conn.close()
+    import time; time.sleep(1)
     log.info("Cleaned all.")
 
 
@@ -137,7 +140,7 @@ def _pos(title, chart_ids):
 def save_dash(title, slug, chart_ids):
     from datetime import datetime
     conn = get_sqlite(); cur = conn.cursor()
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     p = _pos(title, chart_ids)
     row = cur.execute("SELECT id FROM dashboards WHERE slug=?", (slug,)).fetchone()
     if row:
