@@ -73,6 +73,11 @@ def setup_databases(s):
     r = api_post(s, "/database/", {"database_name": "ClickHouse Raw", "sqlalchemy_uri": CH_RAW_URI, "expose_in_sqllab": True, "allow_dml": True, "allow_run_async": False, "extra": '{"allows_virtual_table_explore": true}'})
     raw_db = r.json()["id"] if r.status_code in (200, 201) else None
 
+    conn = get_sqlite()
+    conn.cursor().execute("UPDATE dbs SET allow_run_async=0")
+    conn.commit()
+    conn.close()
+
     log.info("DBs: marts=%s raw=%s", marts_db, raw_db)
     return marts_db, raw_db
 
